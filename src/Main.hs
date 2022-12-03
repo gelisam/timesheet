@@ -12,7 +12,7 @@ import qualified Data.Time.Calendar.OrdinalDate as Time
 
 
 tARGET_HOURS_PER_DAY :: DiffTime
-tARGET_HOURS_PER_DAY = hoursToDiffTime 8
+tARGET_HOURS_PER_DAY = hoursToDiffTime 7 + minutesToDiffTime 30
 
 
 data Day = Day
