@@ -10,6 +10,10 @@ import qualified Data.Time as Time
 import qualified Data.Time.Calendar.OrdinalDate as Time
 
 
+tARGET_HOURS_PER_DAY :: DiffTime
+tARGET_HOURS_PER_DAY = hoursToDiffTime 8
+
+
 data Day = Day
   { date
       :: String
@@ -125,7 +129,11 @@ parseInt s
 parseDays
   :: [String]
   -> [Day]
-parseDays = fmap parseDay . filter (not . null) . go []
+parseDays
+  = fmap parseDay
+  . filter (not . null)  -- remove the dummy empty day we started with
+  . go []
+  . filter (not . null)  -- remove blank lines
   where
     go
       :: [String]
@@ -196,20 +204,37 @@ timeWorkedToday now
     = lines
   >>> stripComments
   >>> parseDays
-  >>> last
-  >>> lineItems
-  >>> map (lineItemDuration now)
-  >>> sum
-  >>> roundToNearestFifteenMinutes
+  >>> fmap ( lineItems
+         >>> map (lineItemDuration now)
+         >>> sum
+         >>> roundToNearestFifteenMinutes
+           )
   >>> pretty
   where
-    pretty :: DiffTime -> String
-    pretty dt
+    pretty :: [DiffTime] -> String
+    pretty dts
       = "I worked "
-     ++ prettyHours dt
+     ++ prettyHours workedToday
      ++ " today, "
-     ++ prettyDiff (dt - hoursToDiffTime 8)
-     ++ "\n"
+     ++ prettyDiff overtimeToday
+     ++ ", "
+     ++ prettyDiff overtimeTotal
+     ++ " in total\n"
+       where
+         workedToday :: DiffTime
+         workedToday = last dts
+
+         overtimeToday :: DiffTime
+         overtimeToday = workedToday - tARGET_HOURS_PER_DAY
+
+         workedTotal :: DiffTime
+         workedTotal = sum dts
+
+         targetTotal :: DiffTime
+         targetTotal = fromIntegral (length dts) * tARGET_HOURS_PER_DAY
+
+         overtimeTotal :: DiffTime
+         overtimeTotal = workedTotal - targetTotal
 
     prettyHours :: DiffTime -> String
     prettyHours (Time.timeToTimeOfDay -> TimeOfDay hours minutes _)

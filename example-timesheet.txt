@@ -3,7 +3,8 @@ Mon 2022-11-14
   9:45-12:00 Implementing a timesheet program
   # lunch time
   13:15-16:00 Implementing a timesheet program
-  16:00-17:30 Testing the timesheet program 
+  16:00-17:15 Testing the timesheet program
+  # I worked 7:00 today, missing 1h00, missing 1h00 in total
 
 Tue 2022-11-15
   8:45-9:45 Emails
