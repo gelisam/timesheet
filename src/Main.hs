@@ -4,6 +4,7 @@ module Main where
 import Control.Category ((>>>))
 import Data.Maybe (fromMaybe)
 import Data.Time (DiffTime, LocalTime(LocalTime), TimeOfDay(TimeOfDay))
+import Text.Printf (printf)
 import Text.Read (readMaybe)
 import qualified Data.Time as Time
 import qualified Data.Time.Calendar.OrdinalDate as Time
@@ -212,9 +213,7 @@ timeWorkedToday now
 
     prettyHours :: DiffTime -> String
     prettyHours (Time.timeToTimeOfDay -> TimeOfDay hours minutes _)
-      = show hours
-     ++ "h"
-     ++ show minutes
+      = printf "%dh%02d" hours minutes
 
     prettyDiff :: DiffTime -> String
     prettyDiff dt
