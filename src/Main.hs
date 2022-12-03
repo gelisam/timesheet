@@ -161,16 +161,22 @@ minutesToDiffTime
 minutesToDiffTime minutes
   = Time.secondsToDiffTime (minutes * 60)
 
+hoursToDiffTime
+  :: Integer
+  -> DiffTime
+hoursToDiffTime hours
+  = minutesToDiffTime (hours * 60)
+
 roundToNearestFifteenMinutes
   :: DiffTime
   -> DiffTime
 roundToNearestFifteenMinutes diffTime
   = let diffToPico :: DiffTime -> Rational
         diffToPico = fromIntegral . Time.diffTimeToPicoseconds
-        
+
         picoToDiff :: Rational -> DiffTime
         picoToDiff = Time.picosecondsToDiffTime . round
-        
+
         roundRational :: Rational -> Rational
         roundRational = fromInteger . round
 
@@ -194,14 +200,30 @@ timeWorkedToday now
   >>> map (lineItemDuration now)
   >>> sum
   >>> roundToNearestFifteenMinutes
-  >>> Time.timeToTimeOfDay
-  >>> ( \(TimeOfDay hours minutes _)
-     -> "I worked "
-     ++ show hours
+  >>> pretty
+  where
+    pretty :: DiffTime -> String
+    pretty dt
+      = "I worked "
+     ++ prettyHours dt
+     ++ " today, "
+     ++ prettyDiff (dt - hoursToDiffTime 8)
+     ++ "\n"
+
+    prettyHours :: DiffTime -> String
+    prettyHours (Time.timeToTimeOfDay -> TimeOfDay hours minutes _)
+      = show hours
      ++ "h"
      ++ show minutes
-     ++ " today\n"
-      )
+
+    prettyDiff :: DiffTime -> String
+    prettyDiff dt
+      | dt > 0
+        = prettyHours dt
+       ++ " overtime"
+      | otherwise
+        = "missing "
+       ++ prettyHours (negate dt)
 
 
 getCurrentTimeOfDay

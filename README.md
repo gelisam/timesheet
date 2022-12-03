@@ -25,4 +25,8 @@ that I have worked 1 hour and 15 minutes today so far.
     $ date +"%H:%M"
     10:16
     $ cabal run timesheet < example-timesheet.txt
-    I worked 1h15 today
+    I worked 1h15 today, missing 6h45
+
+I aim to work 8 hours a day, so timesheet is also telling me how much time
+remains in order to accomplish that goal. All times are rounded to 0h15
+increments.
