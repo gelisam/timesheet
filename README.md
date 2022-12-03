@@ -36,4 +36,4 @@ rounded to 0h15 increments.
 I aim to work 8 hours a day, so timesheet is also telling me how much time
 remains in order to accomplish that goal. Sometimes I go over or under that
 goal, in which case I track the discrepancy over time, so the 1h00 I was
-missing on Monday carries over on Tuesday.
+missing on Monday carries over to Tuesday and then Wednesday.
