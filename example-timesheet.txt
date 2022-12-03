@@ -6,7 +6,11 @@ Mon 2022-11-14
   16:00-17:15 Testing the timesheet program
   # I worked 7:00 today, missing 1h00, missing 1h00 in total
 
-Tue 2022-11-15
+Tue 2022-11-15 (holiday)
+  9:00-9:30 Emails
+  # I worked 0:30 today, missing 0h00, missing 0h30 in total
+
+Wed 2022-11-16
   8:45-9:45 Emails
   # short break
   10:00- Documenting the timesheet program

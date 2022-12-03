@@ -2,6 +2,7 @@
 module Main where
 
 import Control.Category ((>>>))
+import Data.List (isPrefixOf, isSuffixOf)
 import Data.Maybe (fromMaybe)
 import Data.Time (DiffTime, LocalTime(LocalTime), TimeOfDay(TimeOfDay))
 import Text.Printf (printf)
@@ -17,6 +18,8 @@ tARGET_HOURS_PER_DAY = hoursToDiffTime 8
 data Day = Day
   { date
       :: String
+  , isHoliday
+      :: Bool
   , lineItems
       :: [LineItem]
   }
@@ -46,6 +49,14 @@ stripComments
     startsWithHash _
       = False
 
+isHolidayFromDate
+  :: String
+  -> Bool
+isHolidayFromDate s
+  = "Sat " `isPrefixOf` s
+ || "Sun " `isPrefixOf` s
+ || " (holiday)" `isSuffixOf` s
+
 parseDay
   :: [String]
   -> Day
@@ -57,7 +68,7 @@ parseDay
    -> lineItems_
     )
   )
-  = Day date_ lineItems_
+  = Day date_ (isHolidayFromDate date_) lineItems_
 parseDay ss
   = error $ "missing date header in "
          ++ show ss
@@ -127,13 +138,15 @@ parseInt s
                 ++ show s
 
 parseDays
-  :: [String]
+  :: String
   -> [Day]
 parseDays
-  = fmap parseDay
-  . filter (not . null)  -- remove the dummy empty day we started with
-  . go []
-  . filter (not . null)  -- remove blank lines
+    = lines
+  >>> stripComments
+  >>> filter (not . null)  -- remove blank lines
+  >>> go []
+  >>> filter (not . null)  -- remove the dummy empty day we started with
+  >>> fmap parseDay
   where
     go
       :: [String]
@@ -200,41 +213,45 @@ timeWorkedToday
   :: TimeOfDay
   -> String
   -> String
-timeWorkedToday now
-    = lines
-  >>> stripComments
-  >>> parseDays
-  >>> fmap ( lineItems
-         >>> map (lineItemDuration now)
-         >>> sum
-         >>> roundToNearestFifteenMinutes
-           )
-  >>> pretty
+timeWorkedToday now (parseDays -> days)
+  = "I worked "
+ ++ prettyHours workedToday
+ ++ " today, "
+ ++ prettyDiff overtimeToday
+ ++ ", "
+ ++ prettyDiff overtimeTotal
+ ++ " in total\n"
   where
-    pretty :: [DiffTime] -> String
-    pretty dts
-      = "I worked "
-     ++ prettyHours workedToday
-     ++ " today, "
-     ++ prettyDiff overtimeToday
-     ++ ", "
-     ++ prettyDiff overtimeTotal
-     ++ " in total\n"
-       where
-         workedToday :: DiffTime
-         workedToday = last dts
+    workDays :: [Day]
+    workDays = filter (not . isHoliday) days
 
-         overtimeToday :: DiffTime
-         overtimeToday = workedToday - tARGET_HOURS_PER_DAY
+    today :: Day
+    today = last days
 
-         workedTotal :: DiffTime
-         workedTotal = sum dts
+    timeWorked :: Day -> DiffTime
+    timeWorked
+        = lineItems
+      >>> map (lineItemDuration now)
+      >>> sum
+      >>> roundToNearestFifteenMinutes
 
-         targetTotal :: DiffTime
-         targetTotal = fromIntegral (length dts) * tARGET_HOURS_PER_DAY
+    workedToday :: DiffTime
+    workedToday = timeWorked today
 
-         overtimeTotal :: DiffTime
-         overtimeTotal = workedTotal - targetTotal
+    targetToday :: DiffTime
+    targetToday = if isHoliday today then 0 else tARGET_HOURS_PER_DAY
+
+    overtimeToday :: DiffTime
+    overtimeToday = workedToday - targetToday
+
+    workedTotal :: DiffTime
+    workedTotal = sum $ fmap timeWorked days
+
+    targetTotal :: DiffTime
+    targetTotal = fromIntegral (length workDays) * tARGET_HOURS_PER_DAY
+
+    overtimeTotal :: DiffTime
+    overtimeTotal = workedTotal - targetTotal
 
     prettyHours :: DiffTime -> String
     prettyHours (Time.timeToTimeOfDay -> TimeOfDay hours minutes _)
