@@ -25,4 +25,4 @@ that I have worked 1 hour and 15 minutes today so far.
     $ date +"%H:%M"
     10:16
     $ cabal run timesheet < example-timesheet.txt
-    I have worked 1 hours and 15 minutes today so far.
+    I worked 1h15 today

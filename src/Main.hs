@@ -196,11 +196,11 @@ timeWorkedToday now
   >>> roundToNearestFifteenMinutes
   >>> Time.timeToTimeOfDay
   >>> ( \(TimeOfDay hours minutes _)
-     -> "I have worked "
+     -> "I worked "
      ++ show hours
-     ++ " hours and "
+     ++ "h"
      ++ show minutes
-     ++ " minutes today so far.\n"
+     ++ " today\n"
       )
 
 
