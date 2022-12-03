@@ -8,11 +8,13 @@ Here's an example input file:
     Mon 2022-11-14
       9:00-9:45 Emails
       9:45-12:00 Implementing a timesheet program
+      # lunch time
       13:15-16:00 Implementing a timesheet program
       16:00-17:30 Testing the timesheet program 
 
     Tue 2022-11-15
       8:45-9:45 Emails
+      # short break
       10:00- Documenting the timesheet program
 
 If I run `timesheet` at 10:00, then it will say that I have worked 1 hour today

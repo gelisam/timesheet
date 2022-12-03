@@ -27,12 +27,28 @@ data LineItem = LineItem
   }
   deriving Show
 
+stripComments
+  :: [String]
+  -> [String]
+stripComments
+  = filter (not . startsWithHash)
+  where
+    startsWithHash
+      :: String
+      -> Bool
+    startsWithHash ('#':_)
+      = True
+    startsWithHash _
+      = False
+
 parseDay
   :: [String]
   -> Day
 parseDay
   ( date_
-  : ( fmap parseLineItem
+  : ( fmap unindent
+  >>> stripComments
+  >>> fmap parseLineItem
    -> lineItems_
     )
   )
@@ -41,13 +57,20 @@ parseDay ss
   = error $ "missing date header in "
          ++ show ss
 
+unindent
+  :: String
+  -> String
+unindent (' ':' ':s)
+  = s
+unindent s
+  = error $ "missing indentation in "
+         ++ show s
+
 parseLineItem
   :: String
   -> LineItem
 parseLineItem
-  ( ' '
-  : ' '
-  : ( break (== '-')
+  ( ( break (== '-')
    -> ( parseTimestamp -> startTime_
       , '-'
       : ( break (== ' ')
@@ -59,9 +82,6 @@ parseLineItem
     )
   )
   = LineItem startTime_ stopTime_ description_
-parseLineItem s
-  = error $ "missing indentation in "
-         ++ show s
 
 parseMaybeTimestamp
   :: String
@@ -167,6 +187,7 @@ timeWorkedToday
   -> String
 timeWorkedToday now
     = lines
+  >>> stripComments
   >>> parseDays
   >>> last
   >>> lineItems
