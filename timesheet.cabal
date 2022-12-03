@@ -1,0 +1,21 @@
+cabal-version:      2.4
+name:               timesheet
+version:            0.1.0.0
+synopsis: Simple text-based time tracking
+-- description: 
+
+-- A URL where users can report bugs.
+bug-reports: https://github.com/gelisam/timesheet/issues
+
+author:             Samuel Gélineau
+maintainer:         gelisam+github@gmail.com
+
+category: Project Management
+extra-source-files: README.md
+
+executable timesheet
+    main-is:          Main.hs
+    -- other-modules:
+    build-depends:    base
+    hs-source-dirs:   src
+    default-language: Haskell2010
